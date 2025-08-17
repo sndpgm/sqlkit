@@ -1,0 +1,46 @@
+metadata:
+  default_dialect: "postgresql"
+  default_schema: "public"
+
+tables:
+  users:
+    dialect: "postgresql"
+    schema_name: "analytics"
+    columns:
+      - name: "id"
+        type: "Integer"
+        primary_key: true
+      - name: "name"
+        type: "String"
+        length: 255
+        nullable: false
+      - name: "email"
+        type: "String"
+        length: 255
+        unique: true
+    dialect_methods:
+      copy_from_s3:
+        s3_path: "s3://bucket/users/{{ date }}/"
+        credentials: "aws_iam_role=arn:aws:iam::123:role/TestRole"
+        format: "CSV"
+  redshift_sales:
+    dialect: "redshift"
+    columns:
+      - name: "id"
+        type: "Integer"
+        primary_key: true
+      - name: "amount"
+        type: "Float"
+    options:
+      sort_keys:
+        - "id"
+      dist_key: "id"
+      dist_style: "KEY"
+    dialect_methods:
+      copy_from_s3:
+        s3_path: "s3://sales-bucket/{{ year }}/{{ month }}/"
+        format: "CSV"
+        delimiter: ","
+      unload_to_s3:
+        s3_path: "s3://export-bucket/sales/"
+        format: "PARQUET"

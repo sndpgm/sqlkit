@@ -1,0 +1,25 @@
+# tables.yaml
+metadata:
+  default_dialect: "postgresql"
+  default_schema: "public"
+
+tables:
+  users:
+    columns:
+      - name: "id"
+        type: "Integer"
+        primary_key: true
+      - name: "name"
+        type: "String"
+        length: 255
+        nullable: false
+      - name: "amount"
+        type: "Float"
+      - name: "sale_date"
+        type: "Date"
+    dialect_methods:
+      copy_from_s3:
+        s3_path: "s3://bucket/users/{{ date }}/"
+        credentials: "aws_iam_role=arn:aws:iam::123:role/TestRole"
+        format: "CSV"
+        delimiter: ","
